@@ -1,6 +1,6 @@
 # Set Python version
 ARG PYTHON_VERSION=3.7.4
-FROM python:${PYTHON_VERSION}
+FROM python:${PYTHON_VERSION} AS base
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
