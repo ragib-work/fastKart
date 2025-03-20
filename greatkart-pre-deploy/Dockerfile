@@ -1,4 +1,4 @@
-# Set the Python version (Change if needed)
+# Set Python version
 ARG PYTHON_VERSION=3.7.4
 FROM python:${PYTHON_VERSION}
 
@@ -6,30 +6,34 @@ FROM python:${PYTHON_VERSION}
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Install system dependencies (Postgres, Pillow, CairoSVG, GCC, tzdata)
+# Install required system dependencies
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     libjpeg-dev \
-    libcairo2 \
-    gcc \
+    zlib1g-dev \
+    libpng-dev \
+    libfreetype6-dev \
     tzdata \
+    gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Create a virtual environment
+# Create virtual environment
 RUN python -m venv /opt/venv
-ENV PATH=/opt/venv/bin:$PATH
 
-# Upgrade pip & install essential tools
+# Use the virtual environment
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Upgrade pip and wheel
 RUN pip install --upgrade pip setuptools wheel
 
 # Set working directory
 WORKDIR /code
 
-# Copy dependencies first (for caching efficiency)
+# Copy dependencies first for caching efficiency
 COPY requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
-# Copy the project files
+# Copy project files
 COPY ./greatkart-pre-deploy /code
 
 # Set Django environment variables
@@ -39,8 +43,7 @@ ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
 ARG DJANGO_DEBUG=0
 ENV DJANGO_DEBUG=${DJANGO_DEBUG}
 
-# Collect static files (Now runs at runtime instead of build-time)
-RUN python manage.py vendor_pull
+# Run static file collection (if needed)
 RUN python manage.py collectstatic --noinput || echo "Skipping collectstatic"
 
 # Django project settings
