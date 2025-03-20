@@ -1,5 +1,5 @@
 # Set Python version
-ARG PYTHON_VERSION=3.12
+ARG PYTHON_VERSION=3.7.4
 FROM python:${PYTHON_VERSION}
 
 # Set environment variables
