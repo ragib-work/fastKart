@@ -3,7 +3,7 @@ asgiref
 certifi
 chardet
 dj-database-url
-django
+Django>=5.0,<5.1
 django-admin-honeypot
 django-admin-thumbnails
 django-session-timeout
